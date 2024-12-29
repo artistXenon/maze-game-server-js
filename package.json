@@ -1,0 +1,30 @@
+{
+  "name": "mazes",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc && node ./dist/app"
+  },
+  "keywords": [
+    "maze",
+    "server",
+    "game"
+  ],
+  "author": "ailre",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "js-sha1": "^0.7.0",
+    "uuid": "^11.0.3",
+    "ws": "^8.18.0"
+  }
+}
