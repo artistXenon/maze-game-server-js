@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
-import { createRoom, registerClient, joinRoom, renewClient, unregisterClient } from "./states/db";
+import { Client } from "./db/client";
+import { Room } from "./db/room";
 
 function startHTTP() {
     const app = express();
@@ -13,33 +14,47 @@ function startHTTP() {
     });
     
     app.get("/hi", (req, res) => {
-        const client = req.ip ? registerClient(req.ip) : undefined;
-        res.json(client ? { q: true, id: client.id, s: client.secret } : { q: false });
+        
+        const client = req.ip ? Client.register(req.ip) : undefined;
+        res.json(client !== undefined ? { q: true, id: client.Id, s: client.Secret } : { q: false });
     });
 
     app.get("/bye", (req, res) => {
         const { id, s, r } = req.query;
-        const q = unregisterClient(req.ip ?? "", String(id), String(s), String(`:unregister_client:` + r));
+        const client = Client.get(String(id));
+        const q = client !== undefined ? client.unregister(String(s), String(`:unregister_client:` + r)) : true;
         res.json({ q });
     });
 
     app.get("/plz", (req, res) => {
         const { id, s, r } = req.query;
-        const q = renewClient(req.ip ?? "", String(id), String(s), String(`:renew_client:` + r));
+        const client = Client.get(String(id));
+        const q = client !== undefined ? client.renew(req.ip ?? "", String(s), String(`:renew_client:` + r)) : false;
         res.json({ q });
     });
 
     app.get("/room", (req, res) => {
         const { id, s, r } = req.query;
-        const result = createRoom(req.ip ?? "", String(id), String(s), String(`:create_room:` + r));
-        res.json(result ? { q: true, id: result } : { q: false });
+        const client = Client.get(String(id));
+        const room = client?.createRoom(String(s), String(`:create_room:` + r));
+        if (room === undefined) {
+            res.json({ q: false });
+            return;
+        }
+        res.json({ q: true, id: room.Id });
     });
 
     app.get("/room/:roomid", (req, res) => {
         const { roomid } = req.params;
         const { id, s, r } = req.query;
-        const result = joinRoom(req.ip ?? "", String(id), String(s), String(`:join_room:` + r), roomid);
-        res.json(result ? { q: true, id: result } : { q: false });
+        const client = Client.get(String(id));
+        const room = Room.get(roomid);
+        if (client === undefined || room === undefined) {
+            res.json({ q: false });
+            return;
+        }
+        const joinedRoom = client.joinRoom(room, String(s), String(`:join_room:` + r));
+        res.json(joinedRoom !== undefined ? { q: true, id: room.Id } : { q: false });
     });
 
     app.listen(app.get("port"));

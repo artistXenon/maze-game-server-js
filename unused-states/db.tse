@@ -332,6 +332,7 @@ function addConnection(connection: AuthSocketClient, req: IncomingMessage) {
 
             if (json.t === `knock`) {
                 const { n } = json;
+                console.log(`knock by`, n);
                 if ((conn.gameReady & 0b00011) !== 0b00011) return;
                 conn.gameReady |= 0b00100;
                 if (opponentClient?.connection === undefined) return;
@@ -357,8 +358,7 @@ function addConnection(connection: AuthSocketClient, req: IncomingMessage) {
 
                 if (opponentClient?.connection === undefined) return;
                 opponentClient.connection.gameReady = 0b11111;
-            }
-            
+            }            
 
             // TODO: game 
             if (conn.gameReady !== 0b11111) return;
