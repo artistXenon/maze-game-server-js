@@ -133,7 +133,7 @@ export class Connection {
                 const { n } = json;
                 this.state = 0b011;
                 const oppConnection = opponentClient?.Connection;
-                const r = Math.random();
+                // const r = Math.random();
                 if (oppConnection === undefined) return;
                 oppConnection.send({
                     t: `knock`,
@@ -157,6 +157,11 @@ export class Connection {
                 return this.destroy(`Connection#readyStateHandler$default`);
         }
 
+    }
+
+    // INFO: update state
+    public gameOver() {
+        this.state = 0b11;
     }
 
     public send(args: any) {

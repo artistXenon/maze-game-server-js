@@ -1,13 +1,12 @@
-import { sha1 } from "js-sha1";
 import { Client } from "./client";
 
 export class Room {
     private static readonly map: Map<string, Room> = new Map();
 
     private static randomId(): string {
-        const TABLE = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`;
+        const TABLE = `0123456789`;//`abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`;
         let result = ``;
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 6; i++) {
             result += TABLE[Math.floor(TABLE.length * Math.random())];
         }
         if (Room.map.has(result)) return Room.randomId();

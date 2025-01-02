@@ -1,7 +1,7 @@
+import { IncomingMessage } from "node:http";
 import { sha1 } from "js-sha1";
 import { v4 } from "uuid";
 import { WebSocket } from "ws";
-import { IncomingMessage } from "node:http";
 import { Connection, ConnectionListener } from "./connection";
 import { Room } from "./room";
 
@@ -151,8 +151,8 @@ export class Client implements ConnectionListener {
 
     onGameMessage(room: Room, opponentClient: Client, json: any): void {
         const oppConnection = opponentClient.Connection;
-        if (oppConnection === undefined) {
-            return this.Connection?.destroy(`Client#onGameMessage: gaming w/o opponent`);
+        if (oppConnection === undefined || this.Connection === undefined) {
+            return this.Connection?.destroy(`Client#onGameMessage: gaming w/o connection`);
         }
         switch (json.t) {
             case `move`:
@@ -163,6 +163,10 @@ export class Client implements ConnectionListener {
                 return;
             case `end`:
                 const { n } = json;
+                this.Connection.send({t: `end`, w: true});
+                oppConnection.send({t: `end`, w: false});
+                this.Connection.gameOver();
+                oppConnection.gameOver();
                 // TODO: look for end events in bufferEvents
                 // TODO: if exists, clear timeout, send result to all.
                 // TODO: else save event to room bufferEvents and create timeout

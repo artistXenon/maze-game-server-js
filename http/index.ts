@@ -1,13 +1,16 @@
 import express from "express";
 import cors from "cors";
-import { Client } from "./db/client";
-import { Room } from "./db/room";
+import { Client } from "../db/client";
+import { Room } from "../db/room";
+import { router } from "./v2";
 
 function startHTTP() {
     const app = express();
     app.use(cors());
     
     app.set("port", 3000);
+
+    app.use("/v2", router);
     
     app.get("/", (req, res) => {
         res.status(400).send();
@@ -31,6 +34,10 @@ function startHTTP() {
         const client = Client.get(String(id));
         const q = client !== undefined ? client.renew(req.ip ?? "", String(s), String(`:renew_client:` + r)) : false;
         res.json({ q });
+    });
+
+    app.get("/random", (req, res) => {
+    // TODO: how :waaaat:
     });
 
     app.get("/room", (req, res) => {
